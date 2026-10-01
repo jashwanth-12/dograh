@@ -1,17 +1,12 @@
-Key validation behaviour (live, 2026-09-30, fake key "sk_hopper_not_a_real_key" everywhere; the real key was never sent to any non-Hopper host):
+Key validation behaviour at the fixed Hopper endpoint (live, 2026-10-01, fake key everywhere):
 
-wrong Hopper key at Hopper
+wrong Hopper key, Hopper provider
   -> rejected: Invalid Hopper API key. The key was rejected by the API at https://api.withhopper.com/v1. Please check that your API key is correct and has not been revoked.
-Hopper key given to the OpenAI provider (api.openai.com)
-  -> rejected: Invalid OpenAI API key. The key was rejected by the OpenAI API. ... You can verify your keys at https://platform.openai.com/api-keys.
-Hopper key given to the Atlas Cloud provider (api.atlascloud.ai)
-  -> ACCEPTED by validation (Atlas Cloud's GET /v1/models answers 200 without a valid key); the key would fail at call time. Pre-existing Atlas behaviour, not changed by this PR.
-Hopper provider, base_url changed to https://api.withhopper.com/v2
-  -> rejected: The OpenAI-compatible API at https://api.withhopper.com/v2 returned an error while validating the API key. Please verify that the base_url is correct, the service is available, and the API key is valid.
-Hopper provider, base_url changed to https://example.com/v1
-  -> rejected: same "returned an error" message for that URL.
-Hopper provider, base_url to an unreachable host
-  -> rejected: Could not connect to the OpenAI-compatible API at https://nonexistent.withhopper.invalid/v1. Please verify that the base_url is correct and reachable, and try again.
+Hopper key pasted into the OpenAI provider
+  -> rejected: Invalid OpenAI API key. The key was rejected by the OpenAI API. Please check that your API key is correct and has not been revoked. You can verify your keys at https://platform.openai.com/api-keys.
+Hopper key pasted into the Atlas Cloud provider
+  -> accepted by validation
 
-Validation runs on Save Configuration, so a wrong key or wrong URL is never persisted; the previously saved configuration stays in effect.
-Private/loopback base URLs are refused earlier by validate_user_configured_service_url (SSRF guard), same as for every other provider.
+The Hopper provider has no base_url field: every Hopper configuration validates against and runs against https://api.withhopper.com/v1,
+so a Hopper key cannot be routed to another host by a wrong or empty URL. Validation runs on Save Configuration; a rejected key is never persisted.
+Atlas Cloud's GET /v1/models answers 200 to any key, so a Hopper key pasted there passes validation and fails at call time (pre-existing Atlas behaviour).

@@ -1,12 +1,17 @@
-Dograh backend log (local, 2026-09-30, commit under review), key redacted / not logged:
+Dograh backend log (local, 2026-09-30 evening local time, PR head b685b8c5 with the fixed Hopper endpoint), key redacted / never logged:
 
-Saving BYOK config -> API key validation, one GET /v1/models per configured service (LLM, TTS, STT all on Hopper):
-16:24:22.273 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 200 OK"
-16:24:22.365 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 200 OK"
-16:24:22.452 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 200 OK"
+Save Configuration with an invalid Hopper key -> the LLM check is rejected by Hopper; the two OpenAI-provider services the local org uses for voice/transcriber still validate:
+17:33:03.700 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 401 Unauthorized"
+17:33:03.875 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 200 OK"
+17:33:03.971 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 200 OK"
 
-Workflow text-chat test session (run_id=1): greeting turn, then the user turn which triggered a
-move_to_main_agenda tool call followed by the answer:
-16:25:53.927 | [run_id=1] | HTTP Request: POST https://api.withhopper.com/v1/chat/completions "HTTP/1.1 200 OK"
-16:26:11.457 | [run_id=1] | HTTP Request: POST https://api.withhopper.com/v1/chat/completions "HTTP/1.1 200 OK"
-16:26:11.885 | [run_id=1] | HTTP Request: POST https://api.withhopper.com/v1/chat/completions "HTTP/1.1 200 OK"
+Save Configuration with the valid key -> one GET /v1/models per configured service, all 200:
+17:33:23.683 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 200 OK"
+17:33:23.767 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 200 OK"
+17:33:23.859 | HTTP Request: GET https://api.withhopper.com/v1/models "HTTP/1.1 200 OK"
+
+Workflow tester, Test Chat (run_id=2): greeting turn, then the user turn which triggered a move_to_main_agenda tool call followed by the answer:
+17:34:14.542 | [run_id=2] | HTTP Request: POST https://api.withhopper.com/v1/chat/completions "HTTP/1.1 200 OK"
+17:34:32.791 | [run_id=2] | HTTP Request: POST https://api.withhopper.com/v1/chat/completions "HTTP/1.1 200 OK"
+17:34:33.210 | [run_id=2] | HTTP Request: POST https://api.withhopper.com/v1/chat/completions "HTTP/1.1 200 OK"
+17:34:33.210 | [run_id=2] | OpenAILLMService#1 TTFB: 0.112s
